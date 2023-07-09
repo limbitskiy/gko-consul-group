@@ -13,11 +13,11 @@ import { ref } from "vue";
 
 <style>
 .overlay {
-  position: absolute;
+  position: fixed;
   left: 0;
   top: 0;
   right: 0;
-  bottom: 0;
+  height: 100dvh;
   background-color: white;
   display: grid;
   place-items: center;

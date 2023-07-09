@@ -15,23 +15,35 @@ const onClick = () => {
     firstLoad.value = false;
     return;
   } else {
-    isLoading.value = true;
+    spinner.show();
 
     setTimeout(() => {
       showTable.value = true;
-      isLoading.value = false;
+      spinner.hide();
 
       setTimeout(() => {
         const table = document.getElementById("k-n-table");
         const box = table.getBoundingClientRect();
 
         scrollTo({
-          top: box.top,
+          top: box.top + window.scrollY,
           behavior: "smooth",
         });
       }, 500);
     }, 1000);
   }
+};
+
+const spinner = {
+  show() {
+    // document.body.style.overflow = "hidden";
+    isLoading.value = true;
+  },
+
+  hide() {
+    // document.body.style.overflow = "auto";
+    isLoading.value = false;
+  },
 };
 </script>
 
@@ -91,8 +103,13 @@ const onClick = () => {
 
 <style scoped lang="scss">
 h2 {
-  margin-bottom: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin-bottom: 4px;
   font-weight: 500;
+
+  @media (max-width: 485px) {
+    line-height: 1.1;
+  }
 }
 
 small {
@@ -106,12 +123,16 @@ small {
 
 .input-desc {
   font-size: 1.2rem;
-  margin-block: 1rem;
+  margin-block: 1.5rem 1rem;
   width: max-content;
   padding-inline: 0 2rem;
 
   @media (max-width: 1330px) {
     width: 100%;
+  }
+
+  @media (max-width: 850px) {
+    font-size: 1rem;
   }
 }
 </style>

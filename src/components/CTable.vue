@@ -146,6 +146,8 @@ const rows = [
   <div class="q-pa-md" id="k-n-table">
     <q-table
       table-style="font-size: 2rem"
+      flat
+      bordered
       :rows="rows"
       :columns="columns"
       row-key="name"
@@ -156,5 +158,9 @@ const rows = [
 <style scoped>
 #k-n-table {
   margin-block: 4rem 1rem;
+}
+
+.q-pa-md {
+  padding: 16px 0;
 }
 </style>

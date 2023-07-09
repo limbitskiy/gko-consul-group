@@ -36,8 +36,17 @@ import { ref } from "vue";
 
   h3 {
     margin-block: 0 2rem;
-    font-size: 3rem;
+    font-size: clamp(1.5rem, 4vw, 3rem);
     font-weight: 500;
+    line-height: 1.2;
+
+    @media (max-width: 850px) {
+      margin-block: 0 1rem;
+    }
+
+    @media (max-width: 550px) {
+      line-height: 1.3;
+    }
   }
 
   p {
@@ -51,6 +60,18 @@ import { ref } from "vue";
   justify-content: space-between;
   align-items: flex-start;
   padding: 3rem 5rem;
+
+  @media (max-width: 1150px) {
+    align-items: center;
+  }
+
+  @media (max-width: 850px) {
+    padding: 2rem 3rem;
+  }
+
+  @media (max-width: 550px) {
+    padding: 2rem;
+  }
 }
 
 .banner-image {
