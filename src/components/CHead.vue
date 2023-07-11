@@ -1,15 +1,19 @@
 <script setup>
 import { ref } from "vue";
+import COwnexLogo from "./COwnexLogo.vue";
 </script>
 
 <template>
   <div class="header">
     <div class="header-part">
-      <img
-        class="logo-ownex-big"
-        src="images/header-ownex-big.png"
-        alt="big ownex logo"
-      />
+      <div class="header__logo-wrap">
+        <img
+          class="logo-ownex-big"
+          src="images/header-ownex-big.png"
+          alt="big ownex logo"
+        />
+        <COwnexLogo />
+      </div>
       <span class="logo-text">
         Система мониторинга и операционного контроля за обьектами коммерческой
         недвижимости
@@ -50,7 +54,7 @@ import { ref } from "vue";
 .header-part {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
   font-size: 1.2rem;
 
   @media (max-width: 1150px) {
@@ -71,6 +75,8 @@ import { ref } from "vue";
 }
 
 .header__logo-wrap {
+  display: flex;
+  align-items: center;
   min-width: 168px;
 
   @media (max-width: 525px) {

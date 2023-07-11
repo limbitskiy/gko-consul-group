@@ -22,7 +22,7 @@ const onClick = () => {
       spinner.hide();
 
       setTimeout(() => {
-        const table = document.getElementById("k-n-table");
+        const table = document.getElementById("table-data");
         const box = table.getBoundingClientRect();
 
         scrollTo({
@@ -58,6 +58,7 @@ const spinner = {
     <q-input
       outlined
       autogrow
+      placeholder="Не более 20 обьектов в одном запросе"
       type="number"
       v-model.number="kNumbers"
       error-message="Пожалуйста, введите хотя бы один кадастровый номер"
@@ -78,22 +79,6 @@ const spinner = {
     </q-input>
   </div>
 
-  <q-card dark bordered class="input-desc bg-grey-3 my-card text-black">
-    <ul>
-      <li>
-        Ниже будет указана кадастровая стоимость объекта(-ов) недвижимости
-        рассчитанная в рамках проведения очередной ГКО.
-      </li>
-
-      <li>
-        Планируемая дата начала применения указанной кадастровой стоимости: с
-        01.01.2024г.
-      </li>
-
-      <li>Срок подачи замечаний на Отчет по ГКО: до __.__.____г.</li>
-    </ul>
-  </q-card>
-
   <CTable v-if="showTable" />
 
   <CBanner v-if="showTable" />
@@ -105,7 +90,7 @@ const spinner = {
 h2 {
   font-size: clamp(2rem, 4vw, 3rem);
   margin-bottom: 4px;
-  font-weight: 500;
+  font-weight: 600;
 
   @media (max-width: 485px) {
     line-height: 1.1;

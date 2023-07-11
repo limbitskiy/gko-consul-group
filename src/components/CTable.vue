@@ -143,20 +143,38 @@ const rows = [
 </script>
 
 <template>
-  <div class="q-pa-md" id="k-n-table">
-    <q-table
-      table-style="font-size: 2rem"
-      flat
-      bordered
-      :rows="rows"
-      :columns="columns"
-      row-key="name"
-    />
+  <div id="table-data">
+    <q-card dark bordered class="input-desc bg-grey-3 my-card text-black">
+      <ul>
+        <li>
+          Ниже будет указана кадастровая стоимость объекта(-ов) недвижимости
+          рассчитанная в рамках проведения очередной ГКО.
+        </li>
+
+        <li>
+          Планируемая дата начала применения указанной кадастровой стоимости: с
+          01.01.2024г.
+        </li>
+
+        <li>Срок подачи замечаний на Отчет по ГКО: до __.__.____г.</li>
+      </ul>
+    </q-card>
+
+    <div class="k-n-table q-pa-md">
+      <q-table
+        table-style="font-size: 2rem"
+        flat
+        bordered
+        :rows="rows"
+        :columns="columns"
+        row-key="name"
+      />
+    </div>
   </div>
 </template>
 
 <style scoped>
-#k-n-table {
+.k-n-table {
   margin-block: 4rem 1rem;
 }
 
