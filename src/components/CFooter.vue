@@ -1,10 +1,8 @@
-<script setup>
-import { ref } from "vue";
-</script>
-
 <template>
   <div class="footer">
-    <p>© 2023 Consul Group. Все права защищены.</p>
+    <span
+      >© {{ new Date().getFullYear() }} Consul Group. Все права защищены.</span
+    >
   </div>
 </template>
 
@@ -12,19 +10,13 @@ import { ref } from "vue";
 .footer {
   border-top: 1px solid #bebdbd;
   padding-block: 1rem;
-  margin-top: 3rem;
+  margin-top: 2rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
 
-  p {
-    margin: 0;
-    font-size: 1rem;
-  }
-
-  @media (max-width: 850px) {
-    margin-top: 1rem;
-
-    p {
-      font-size: 0.8rem;
-    }
+  span {
+    font-size: 0.9rem;
   }
 }
 </style>

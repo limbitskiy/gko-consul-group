@@ -4,20 +4,16 @@ import { ref } from "vue";
 
 <template>
   <div class="banner">
-    <div class="banner-content">
-      <div class="banner-text">
-        <h3>Считаете кадастровую стоимость завышенной?</h3>
-        <p>
-          Обратитесь в <a href="https://consul.group">CONSUL GROUP</a> для
-          оценки потенциала снижения кадастровой стоимости!
-        </p>
-      </div>
-      <button>Отправить сообщение</button>
-    </div>
-    <img
-      class="banner-image"
-      src="images/footer-banner-image.png"
-      slt="banner image"
+    <h3>Считаете кадастровую стоимость завышенной?</h3>
+    <p>
+      Обратитесь в <a href="https://consul.group">CONSUL GROUP</a> для оценки
+      потенциала снижения кадастровой стоимости!
+    </p>
+    <q-btn
+      outline
+      class="consul-button"
+      label="ОТПРАВИТЬ СООБЩЕНИЕ"
+      :square="true"
     />
   </div>
 </template>
@@ -25,10 +21,34 @@ import { ref } from "vue";
 <style scoped lang="scss">
 .banner {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  color: white;
-  background-color: #6889ab;
-  margin-block: 3rem;
+  gap: 1rem;
+  margin-block: 8rem 6rem;
+  position: relative;
+
+  @media (max-width: 750px) {
+    margin-block: 4rem 3rem;
+    gap: 0.5rem;
+    text-align: center;
+    .consul-button {
+      margin-inline: auto;
+    }
+  }
+
+  &:after {
+    content: "";
+    width: 280px;
+    height: 220px;
+    background: center/cover no-repeat url("../assets/images/watermark.png");
+    position: absolute;
+    right: 0;
+    bottom: -128px;
+
+    @media (max-width: 740px) {
+      display: none;
+    }
+  }
 
   a {
     color: white;
@@ -36,47 +56,22 @@ import { ref } from "vue";
 
   h3 {
     margin-block: 0 2rem;
-    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-size: clamp(30px, 4vw, 46px);
     font-weight: 500;
     line-height: 1.2;
-
-    @media (max-width: 850px) {
-      margin-block: 0 1rem;
-    }
-
-    @media (max-width: 550px) {
-      line-height: 1.3;
-    }
   }
 
   p {
-    margin-bottom: 2rem;
-  }
-}
-
-.banner-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 3rem 5rem;
-
-  @media (max-width: 1150px) {
-    align-items: center;
+    font-size: clamp(19px, 3vw, 24px);
+    max-width: 700px;
   }
 
-  @media (max-width: 850px) {
-    padding: 2rem 3rem;
-  }
-
-  @media (max-width: 550px) {
-    padding: 2rem;
-  }
-}
-
-.banner-image {
-  @media (max-width: 1150px) {
-    display: none;
+  .consul-button {
+    color: #ff4c00;
+    font-size: 16px;
+    height: 56px;
+    width: min(400px, 100%);
+    line-height: 1px;
   }
 }
 </style>

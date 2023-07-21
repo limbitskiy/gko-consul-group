@@ -1,11 +1,7 @@
-<script setup>
-import { ref } from "vue";
-</script>
-
 <template>
   <div class="overlay">
     <div class="spinner">
-      <img src="images/spinner-inverted.gif" width="60" />
+      <img src="../assets/images/spinner.gif" width="60" />
       <span>Идет загрузка...</span>
     </div>
   </div>
@@ -18,7 +14,7 @@ import { ref } from "vue";
   top: 0;
   right: 0;
   height: 100dvh;
-  background-color: white;
+  background-color: black;
   display: grid;
   place-items: center;
 }

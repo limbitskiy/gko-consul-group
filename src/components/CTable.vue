@@ -29,13 +29,13 @@ const columns = [
     sortable: true,
     sort: (a, b) => parseInt(a, 10) - parseInt(b, 10),
   },
-  {
-    name: "iron",
-    label: "Может что-то еще",
-    field: "iron",
-    sortable: true,
-    sort: (a, b) => parseInt(a, 10) - parseInt(b, 10),
-  },
+  // {
+  //   name: "iron",
+  //   label: "Может что-то еще",
+  //   field: "iron",
+  //   sortable: true,
+  //   sort: (a, b) => parseInt(a, 10) - parseInt(b, 10),
+  // },
 ];
 
 const rows = [
@@ -140,45 +140,101 @@ const rows = [
     iron: "6%",
   },
 ];
+
+const tableMode = ref(false);
 </script>
 
 <template>
   <div id="table-data">
-    <q-card dark bordered class="input-desc bg-grey-3 my-card text-black">
-      <ul>
-        <li>
-          Ниже будет указана кадастровая стоимость объекта(-ов) недвижимости
-          рассчитанная в рамках проведения очередной ГКО.
-        </li>
-
-        <li>
-          Планируемая дата начала применения указанной кадастровой стоимости: с
-          01.01.2024г.
-        </li>
-
-        <li>Срок подачи замечаний на Отчет по ГКО: до __.__.____г.</li>
-      </ul>
-    </q-card>
-
-    <div class="k-n-table q-pa-md">
+    <div class="table-wrap">
+      <div class="toggle">
+        <q-toggle
+          v-model="tableMode"
+          color="red"
+          label="Таблица"
+          left-label
+        /><span>Карточки</span>
+      </div>
       <q-table
         table-style="font-size: 2rem"
         flat
+        :grid="tableMode"
         bordered
+        :dark="true"
+        :square="true"
         :rows="rows"
         :columns="columns"
         row-key="name"
+        class="consul-table"
       />
     </div>
+
+    <ul class="table-details">
+      <li>
+        <span class="table-details__title">Стоимость объекта</span>
+        <p>
+          Указана кадастровая стоимость объекта(-ов) недвижимости рассчитанная в
+          рамках проведения очередной ГКО
+        </p>
+      </li>
+
+      <li>
+        <span class="table-details__title">Дата начала</span>
+        <p>
+          Планируемая дата начала применения указанной кадастровой стоимости: с
+          01.01.2024г
+        </p>
+      </li>
+
+      <li>
+        <span class="table-details__title">Срок подачи</span>
+        <p>Срок подачи замечаний на Отчет по ГКО: до __.__.____г</p>
+      </li>
+    </ul>
   </div>
 </template>
 
-<style scoped>
-.k-n-table {
+<style scoped lang="scss">
+#table-data {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
   margin-block: 4rem 1rem;
+
+  @media (max-width: 1000px) {
+    grid-template-columns: 1fr;
+  }
 }
 
-.q-pa-md {
-  padding: 16px 0;
+.table-wrap {
+  order: 2;
+  min-width: 0;
+  max-width: 100%;
+  width: auto;
+}
+
+.table-details {
+  order: 3;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: clamp(19px, 3vw, 24px);
+
+  @media (max-width: 1000px) {
+    order: 1;
+  }
+
+  p {
+    color: #b5b5b5;
+  }
+
+  .table-details__title {
+    font-weight: 500;
+  }
+}
+
+.toggle {
+  border: 1px solid white;
+  padding: 1rem;
 }
 </style>

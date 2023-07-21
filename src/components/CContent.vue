@@ -30,7 +30,7 @@ const onClick = () => {
           behavior: "smooth",
         });
       }, 500);
-    }, 1000);
+    }, 1500);
   }
 };
 
@@ -48,35 +48,71 @@ const spinner = {
 </script>
 
 <template>
-  <h2>Введите кадастровый номер:</h2>
-  <small
-    >* только здания, помещения, сооружения, ОНС расположенные на территории
-    г.Москва
-  </small>
+  <div class="content-title">
+    <h2>Справочная информация о величине кадастровой стоимости</h2>
+    <span>
+      полученных в результате проведения в 2023 году государственной кадастровой
+      оценки объектов недвижимости расположенных на территории г.Москва.
+    </span>
+  </div>
 
   <div class="k-n-input">
-    <q-input
-      outlined
-      autogrow
-      placeholder="Не более 20 обьектов в одном запросе"
-      type="number"
-      v-model.number="kNumbers"
-      error-message="Пожалуйста, введите хотя бы один кадастровый номер"
-      :error="!isValid"
-    >
-      <template v-slot:append>
-        <q-icon
-          v-if="kNumbers !== ''"
-          name="close"
-          @click="kNumbers = ''"
-          class="cursor-pointer"
-        />
-      </template>
-
-      <template v-slot:after>
-        <q-btn round dense flat icon="send" @click="onClick" />
-      </template>
-    </q-input>
+    <div class="input-inner">
+      <q-input
+        :dark="true"
+        outlined
+        autogrow
+        :square="true"
+        placeholder="Не более 20 обьектов"
+        type="number"
+        v-model.number="kNumbers"
+        error-message="Пожалуйста, введите хотя бы один кадастровый номер"
+        :error="!isValid"
+        class="consul-input"
+        clearable
+      >
+        <template v-slot:append>
+          <q-btn round dense flat icon="info">
+            <q-popup-proxy
+              transition-show="flip-up"
+              transition-hide="flip-down"
+            >
+              <q-banner class="bg-grey-9 text-white">
+                <template v-slot:avatar>
+                  <q-icon name="info" class="popup-icon" />
+                </template>
+                <ul class="popup-list">
+                  <li>
+                    Указана кадастровая стоимость объекта(-ов) недвижимости
+                    рассчитанная в рамках проведения очередной ГКО.
+                  </li>
+                  <li>
+                    Планируемая дата начала применения указанной кадастровой
+                    стоимости: с 01.01.2024г
+                  </li>
+                  <li>Срок подачи замечаний на Отчет по ГКО: до __.__.____г</li>
+                </ul>
+              </q-banner>
+            </q-popup-proxy>
+          </q-btn>
+        </template>
+      </q-input>
+      <small class="before"
+        >* только здания, помещения, сооружения, ОНС расположенные на территории
+        г.Москва
+      </small>
+      <q-btn
+        outline
+        class="consul-button"
+        label="ИСКАТЬ"
+        :square="true"
+        @click="onClick"
+      />
+    </div>
+    <small class="after"
+      >* только здания, помещения, сооружения, ОНС расположенные на территории
+      г.Москва
+    </small>
   </div>
 
   <CTable v-if="showTable" />
@@ -87,23 +123,83 @@ const spinner = {
 </template>
 
 <style scoped lang="scss">
-h2 {
-  font-size: clamp(2rem, 4vw, 3rem);
-  margin-bottom: 4px;
-  font-weight: 600;
+.content-title {
+  max-width: 720px;
+  margin-block: 4rem;
 
-  @media (max-width: 485px) {
-    line-height: 1.1;
+  h2 {
+    font-size: clamp(30px, 4vw, 46px);
+    margin-bottom: 8px;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  span {
+    font-size: clamp(19px, 3vw, 24px);
+    display: inline-block;
+  }
+
+  @media (max-width: 1000px) {
+    max-width: initial;
+    text-align: center;
+  }
+
+  @media (max-width: 500px) {
+    margin-block: 4rem;
   }
 }
 
-small {
-  color: #6d6d6d;
-}
-
 .k-n-input {
-  max-width: 500px;
+  max-width: 666px;
   margin-block: 2rem 1rem;
+
+  small {
+    font-size: 19px;
+    color: #c5c5c5;
+    &.before {
+      display: none;
+      margin-bottom: 3rem;
+    }
+  }
+
+  .consul-input {
+    font-size: 19px;
+    width: 450px;
+  }
+
+  .consul-button {
+    color: #ff4c00;
+    font-size: 16px;
+    height: 56px;
+    min-width: 130px;
+    line-height: 1px;
+  }
+
+  .input-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  @media (max-width: 666px) {
+    small.after {
+      display: none;
+    }
+    small.before {
+      display: block;
+    }
+
+    .input-inner {
+      gap: 0;
+    }
+    .consul-input {
+      width: 100%;
+    }
+
+    .consul-button {
+      min-width: 100%;
+    }
+  }
 }
 
 .input-desc {
@@ -111,13 +207,26 @@ small {
   margin-block: 1.5rem 1rem;
   width: max-content;
   padding-inline: 0 2rem;
+}
 
-  @media (max-width: 1330px) {
-    width: 100%;
-  }
+.popup-icon {
+  margin-top: 1rem;
 
-  @media (max-width: 850px) {
-    font-size: 1rem;
+  @media (max-width: 600px) {
+    display: none;
   }
+}
+
+.popup-list {
+  @media (max-width: 600px) {
+    padding: 0;
+  }
+}
+</style>
+
+<style>
+/* active input border color */
+.q-field__control {
+  color: white !important;
 }
 </style>

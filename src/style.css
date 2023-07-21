@@ -6,67 +6,32 @@
 
 body {
   margin: 0;
-  display: flex;
-  min-width: 320px;
-  min-height: 100vh;
   box-sizing: border-box;
-  font-size: 1.5rem;
 
   font-family: "Jost", sans-serif, Inter, system-ui, Avenir, Helvetica, Arial,
     sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
+  font-size: 1.5rem;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
-}
 
-@media (max-width: 850px) {
-  body {
-    font-size: 1rem;
-  }
+  background-color: black;
+  color: white;
 }
 
 a {
   text-decoration: none;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
 #app {
-  max-width: 1680px;
-  margin: 0 auto;
-  padding-inline: 2rem;
   display: flex;
   flex-direction: column;
-  width: 100%;
   position: relative;
-}
-
-@media (max-width: 600px) {
-  #app {
-    padding-inline: 0.5rem;
-  }
+  min-height: 100dvh;
 }
 
 @media (prefers-color-scheme: light) {
