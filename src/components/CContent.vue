@@ -7,7 +7,9 @@ import axios from "axios";
 
 const api = "https://api3.consul.group/v1/ownex/cost";
 
-const kNumbers = ref(null);
+const kNumbers = ref(
+  "77:09:0005004:1039, 77:01:0002021:2822 ; 77:01:0001053:1053"
+);
 
 const isLoading = ref(false);
 
@@ -21,9 +23,15 @@ const tableData = ref(null);
 const showDialog = ref(false);
 const dialogText = ref("");
 
+const kNRegex = /^\d{2}:\d{2}:\d{6,7}:\d{1,6}$/g;
+let parsedInput = null;
+
 const onClick = () => {
-  if (!kNumbers.value || !validateOnSend(kNumbers.value)) {
+  const notValidated = validateOnSend(kNumbers.value);
+  console.error(notValidated);
+  if (notValidated.length) {
     firstLoad.value = false;
+    dialog.show(`Не прошли валидацию: ${notValidated}`);
     return;
   }
 
@@ -32,7 +40,7 @@ const onClick = () => {
 
   axios
     .post(api, {
-      numbers: parseInputForRequest(kNumbers.value),
+      numbers: parsedInput,
     })
     .then((res) => res.data)
     .then((data) => {
@@ -41,6 +49,7 @@ const onClick = () => {
         return;
       } else {
         spinner.hide(table.show, data.data);
+        parsedInput = null;
       }
     });
 };
@@ -50,7 +59,30 @@ const validateOnInput = (input) => {
 };
 
 const validateOnSend = (input) => {
-  return true;
+  const kNSet = new Set();
+  kNSet.add(input);
+
+  splitSetBy("\n");
+  splitSetBy(";");
+  splitSetBy(",");
+
+  function splitSetBy(divider) {
+    for (const item of kNSet) {
+      const split = item.split(divider);
+      if (split.length > 1) {
+        kNSet.delete(item);
+        split.forEach((item) => {
+          if (!item) return;
+          kNSet.add(item.replace(/\s+/g, ""));
+        });
+      }
+    }
+  }
+
+  parsedInput = [...kNSet];
+  console.error([...kNSet]);
+  return [...kNSet].filter((item) => !item.match(kNRegex));
+  // return [];
 };
 
 const parseInputForRequest = (input) => {
@@ -273,6 +305,7 @@ const table = {
     }
     small.before {
       display: block;
+      margin-top: 10px;
     }
 
     .input-inner {

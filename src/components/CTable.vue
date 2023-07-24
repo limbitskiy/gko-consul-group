@@ -130,3 +130,9 @@ const tableMode = ref(false);
   padding: 1rem;
 }
 </style>
+
+<style>
+.q-table__grid-item {
+  padding: 0 !important;
+}
+</style>
