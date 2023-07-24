@@ -3,46 +3,114 @@ import { ref, computed } from "vue";
 import CTable from "./CTable.vue";
 import CBanner from "./CBanner.vue";
 import CSpinner from "./CSpinner.vue";
+import axios from "axios";
+
+const api = "https://api3.consul.group/v1/ownex/cost";
 
 const kNumbers = ref(null);
+
 const isLoading = ref(false);
-const showTable = ref(false);
+
 const isValid = computed(() => kNumbers.value || firstLoad.value);
 const firstLoad = ref(true);
 
+const tableVisible = ref(false);
+
+const tableData = ref(null);
+
+const showDialog = ref(false);
+const dialogText = ref("");
+
 const onClick = () => {
-  if (!kNumbers.value) {
+  if (!kNumbers.value || !validateOnSend(kNumbers.value)) {
     firstLoad.value = false;
     return;
-  } else {
-    spinner.show();
-
-    setTimeout(() => {
-      showTable.value = true;
-      spinner.hide();
-
-      setTimeout(() => {
-        const table = document.getElementById("table-data");
-        const box = table.getBoundingClientRect();
-
-        scrollTo({
-          top: box.top + window.scrollY,
-          behavior: "smooth",
-        });
-      }, 500);
-    }, 1500);
   }
+
+  spinner.show();
+  table.hide();
+
+  axios
+    .post(api, {
+      numbers: parseInputForRequest(kNumbers.value),
+    })
+    .then((res) => res.data)
+    .then((data) => {
+      if (!data.data.length) {
+        spinner.hide(dialog.show, "По данному запросу ничего не найдено");
+        return;
+      } else {
+        spinner.hide(table.show, data.data);
+      }
+    });
+};
+
+const validateOnInput = (input) => {
+  // console.error(input);
+};
+
+const validateOnSend = (input) => {
+  return true;
+};
+
+const parseInputForRequest = (input) => {
+  return input.split(",");
+};
+
+const dialog = {
+  show(text) {
+    dialogText.value = text;
+    showDialog.value = true;
+  },
+  hide() {
+    showDialog.value = false;
+  },
 };
 
 const spinner = {
+  canHide: false,
+
   show() {
     // document.body.style.overflow = "hidden";
     isLoading.value = true;
+    setTimeout(() => {
+      this.canHide = true;
+    }, 1000);
+  },
+
+  hide(callback, arg) {
+    // document.body.style.overflow = "auto";
+    if (this.canHide) {
+      isLoading.value = false;
+      this.canHide = false;
+      callback(arg);
+    } else {
+      setTimeout(() => {
+        this.hide(callback, arg);
+      }, 200);
+    }
+  },
+};
+
+const table = {
+  show(data) {
+    tableData.value = data;
+    tableVisible.value = true;
+
+    setTimeout(() => {
+      const table = document.getElementById("table-data");
+      const box = table.getBoundingClientRect();
+
+      scrollTo({
+        top: box.top + window.scrollY,
+        behavior: "smooth",
+      });
+    }, 300);
   },
 
   hide() {
-    // document.body.style.overflow = "auto";
-    isLoading.value = false;
+    tableVisible.value = false;
+    tableData.value = null;
   },
 };
 </script>
@@ -65,11 +133,12 @@ const spinner = {
         :square="true"
         placeholder="Не более 20 обьектов"
         type="number"
-        v-model.number="kNumbers"
-        error-message="Пожалуйста, введите хотя бы один кадастровый номер"
+        v-model="kNumbers"
+        error-message="Пожалуйста, введите минимум один кадастровый номер"
         :error="!isValid"
         class="consul-input"
         clearable
+        @update:model-value="validateOnInput"
       >
         <template v-slot:append>
           <q-btn round dense flat icon="info">
@@ -115,11 +184,28 @@ const spinner = {
     </small>
   </div>
 
-  <CTable v-if="showTable" />
+  <CTable v-if="tableVisible" :data="tableData" />
 
-  <CBanner v-if="showTable" />
+  <CBanner v-if="tableVisible" />
 
   <CSpinner v-if="isLoading" />
+
+  <q-dialog v-model="showDialog" :square="true" class="consul-dialog">
+    <q-card>
+      <q-card-section class="consul-dialog__header">
+        <q-icon name="warning" />
+        <div class="text-h6">Ошибка</div>
+      </q-card-section>
+
+      <q-card-section class="q-pt-none text-subtitle1">
+        {{ dialogText }}
+      </q-card-section>
+
+      <q-card-actions align="right">
+        <q-btn flat label="OK" color="red" v-close-popup />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <style scoped lang="scss">
@@ -220,6 +306,19 @@ const spinner = {
 .popup-list {
   @media (max-width: 600px) {
     padding: 0;
+  }
+}
+
+.consul-dialog {
+  .q-card {
+    box-shadow: none;
+    border: 1px solid grey;
+  }
+
+  .consul-dialog__header {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
   }
 }
 </style>

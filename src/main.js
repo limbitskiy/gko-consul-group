@@ -7,6 +7,10 @@ import './style.css'
 
 const app = createApp(App)
 
-app.use(Quasar)
+app.use(Quasar, {
+  config: {
+    dark: true
+  }
+})
 
 app.mount('#app')
