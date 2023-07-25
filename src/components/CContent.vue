@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, nextTick } from "vue";
+import { ref, reactive } from "vue";
 import CTable from "./CTable.vue";
 import CBanner from "./CBanner.vue";
 import CSpinner from "./CSpinner.vue";
@@ -7,25 +7,78 @@ import axios from "axios";
 
 const api = "https://api3.consul.group/v1/ownex/cost";
 
-const kNumbers = ref("");
+const input = ref("");
 
-const isLoading = ref(false);
+const table = reactive({
+  isVisible: false,
+  tableData: null,
 
-const isValid = computed(() => kNumbers.value || firstLoad.value);
-const firstLoad = ref(true);
+  show(data) {
+    this.tableData = data;
+    this.isVisible = true;
 
-const tableVisible = ref(false);
+    setTimeout(() => {
+      const table = document.getElementById("table-data");
+      const box = table.getBoundingClientRect();
 
-const tableData = ref(null);
+      scrollTo({
+        top: box.top + window.scrollY,
+        behavior: "smooth",
+      });
+    }, 300);
+  },
 
-const showDialog = ref(false);
-const dialogText = ref("");
+  hide() {
+    this.isVisible = false;
+    this.tableData = null;
+  },
+});
+
+const dialog = reactive({
+  showSimpleDialog: false,
+  showListDialog: false,
+  dialogText: "",
+
+  show(text, type) {
+    this.dialogText = text;
+    this.showSimpleDialog = true;
+  },
+  hide() {
+    this.showSimpleDialog = false;
+  },
+});
+
+const spinner = reactive({
+  canHide: false,
+  isLoading: false,
+
+  show() {
+    // document.body.style.overflow = "hidden";
+    this.isLoading = true;
+    setTimeout(() => {
+      this.canHide = true;
+    }, 1000);
+  },
+
+  hide(callback, arg) {
+    // document.body.style.overflow = "auto";
+    if (this.canHide) {
+      this.isLoading = false;
+      this.canHide = false;
+      callback(arg);
+    } else {
+      setTimeout(() => {
+        this.hide(callback, arg);
+      }, 200);
+    }
+  },
+});
 
 const onClick = () => {
-  const kNRegex = /^\d{2}:\d{2}:\d{6,7}:\d{1,6}$/g;
-  const parsedInput = parseInput(kNumbers.value);
+  if (!input.value.length) return;
 
-  if (!kNumbers.value.length) return;
+  const kNRegex = /^\d{2}:\d{2}:\d{6,7}:\d{1,6}$/g;
+  const parsedInput = parseInput(input.value);
 
   if (parsedInput.length > 5) {
     dialog.show("Можно вводить не более 20 кадастровых номеров за один раз");
@@ -35,8 +88,7 @@ const onClick = () => {
   const notValidated = parsedInput.filter((item) => !item.match(kNRegex));
 
   if (notValidated.length) {
-    firstLoad.value = false;
-    dialog.show(`Не прошли валидацию: ${notValidated}`);
+    dialog.show(`Не соблюден формат кадастрового номера: ${notValidated}`);
     return;
   }
 
@@ -50,68 +102,15 @@ const onClick = () => {
     .then((res) => res.data)
     .then((data) => {
       if (!data.data.length) {
-        spinner.hide(dialog.show, "По данному запросу ничего не найдено");
+        spinner.hide(
+          dialog.show.bind(dialog),
+          "По данному запросу ничего не найдено"
+        );
         return;
       } else {
-        spinner.hide(table.show, data.data);
+        spinner.hide(table.show.bind(table), data.data);
       }
     });
-};
-
-const validateOnInput = (input) => {
-  nextTick().then(() => {
-    console.error(input);
-    kNumbers.value = kNumbers.value.slice(0, -1);
-  });
-};
-
-const inputValidator = {
-  lastValue: null,
-  validate(input) {
-    console.error(input);
-    if (!input) return;
-
-    const diff = {
-      value: null,
-      index: null,
-    };
-
-    if (this.lastValue) {
-      // if it's pasted - ignore it
-      if (input.length - this.lastValue.length > 1) return;
-
-      input.split("").forEach((char, index) => {
-        if (char != this.lastValue.charAt(index)) {
-          diff.value = char;
-          diff.index = index;
-        }
-      });
-    } else {
-      diff.value = input;
-      diff.index = 0;
-    }
-
-    // validate the diff
-    const validated = /[\d:;,]/.test(diff.value);
-
-    if (!validated) {
-      nextTick().then(() => {
-        if (diff.index === 0) {
-          kNumbers.value = input.slice(1);
-        } else {
-          kNumbers.value = this.lastValue =
-            input.slice(0, diff.index) + input.slice(diff.index + 1);
-        }
-      });
-    } else {
-      this.lastValue = input;
-    }
-
-    // console.error(diff);
-    // console.error(validated);
-    // console.error(kNumbers.value);
-    // console.error(this);
-  },
 };
 
 const parseInput = (input) => {
@@ -135,70 +134,7 @@ const parseInput = (input) => {
     }
   }
 
-  // console.error([...kNSet]);
-
   return [...kNSet];
-};
-
-const parseInputForRequest = (input) => {
-  return input.split(",");
-};
-
-const dialog = {
-  show(text) {
-    dialogText.value = text;
-    showDialog.value = true;
-  },
-  hide() {
-    showDialog.value = false;
-  },
-};
-
-const spinner = {
-  canHide: false,
-
-  show() {
-    // document.body.style.overflow = "hidden";
-    isLoading.value = true;
-    setTimeout(() => {
-      this.canHide = true;
-    }, 1000);
-  },
-
-  hide(callback, arg) {
-    // document.body.style.overflow = "auto";
-    if (this.canHide) {
-      isLoading.value = false;
-      this.canHide = false;
-      callback(arg);
-    } else {
-      setTimeout(() => {
-        this.hide(callback, arg);
-      }, 200);
-    }
-  },
-};
-
-const table = {
-  show(data) {
-    tableData.value = data;
-    tableVisible.value = true;
-
-    setTimeout(() => {
-      const table = document.getElementById("table-data");
-      const box = table.getBoundingClientRect();
-
-      scrollTo({
-        top: box.top + window.scrollY,
-        behavior: "smooth",
-      });
-    }, 300);
-  },
-
-  hide() {
-    tableVisible.value = false;
-    tableData.value = null;
-  },
 };
 </script>
 
@@ -220,12 +156,16 @@ const table = {
         :square="true"
         placeholder="Не более 20 обьектов"
         type="number"
-        v-model="kNumbers"
-        error-message="Пожалуйста, введите минимум один кадастровый номер"
-        :error="!isValid"
+        v-model="input"
         class="consul-input"
         clearable
-        @update:model-value="(e) => inputValidator.validate(e)"
+        :rules="[
+          (val) =>
+            !!val || `Пожалуйста, введите минимум один кадастровый номер`,
+          (val) =>
+            /^[\d:;,.\s]+$/gm.test(val) ||
+            `Разрешены только цифры и знаки препинания`,
+        ]"
       >
         <template v-slot:append>
           <q-btn round dense flat icon="info">
@@ -271,13 +211,38 @@ const table = {
     </small>
   </div>
 
-  <CTable v-if="tableVisible" :data="tableData" />
+  <CTable v-if="table.isVisible" :data="table.tableData" />
 
-  <CBanner v-if="tableVisible" />
+  <CBanner v-if="table.isVisible" />
 
-  <CSpinner v-if="isLoading" />
+  <CSpinner v-if="spinner.isLoading" />
 
-  <q-dialog v-model="showDialog" :square="true" class="consul-dialog">
+  <q-dialog
+    v-model="dialog.showSimpleDialog"
+    :square="true"
+    class="consul-dialog"
+  >
+    <q-card>
+      <q-card-section class="consul-dialog__header">
+        <q-icon name="warning" />
+        <div class="text-h6">Ошибка</div>
+      </q-card-section>
+
+      <q-card-section class="q-pt-none text-subtitle1">
+        {{ dialog.dialogText }}
+      </q-card-section>
+
+      <q-card-actions align="right">
+        <q-btn flat label="OK" color="red" v-close-popup />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+
+  <q-dialog
+    v-model="dialog.showListDialog"
+    :square="true"
+    class="consul-dialog"
+  >
     <q-card>
       <q-card-section class="consul-dialog__header">
         <q-icon name="warning" />
