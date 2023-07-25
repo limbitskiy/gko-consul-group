@@ -68,6 +68,7 @@ const validateOnInput = (input) => {
 const inputValidator = {
   lastValue: null,
   validate(input) {
+    console.error(input);
     if (!input) return;
 
     const diff = {
