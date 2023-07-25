@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, nextTick } from "vue";
 import CTable from "./CTable.vue";
 import CBanner from "./CBanner.vue";
 import CSpinner from "./CSpinner.vue";
@@ -7,9 +7,7 @@ import axios from "axios";
 
 const api = "https://api3.consul.group/v1/ownex/cost";
 
-const kNumbers = ref(
-  "77:09:0005004:1039, 77:01:0002021:2822 ; 77:01:0001053:1053"
-);
+const kNumbers = ref("");
 
 const isLoading = ref(false);
 
@@ -23,12 +21,19 @@ const tableData = ref(null);
 const showDialog = ref(false);
 const dialogText = ref("");
 
-const kNRegex = /^\d{2}:\d{2}:\d{6,7}:\d{1,6}$/g;
-let parsedInput = null;
-
 const onClick = () => {
-  const notValidated = validateOnSend(kNumbers.value);
-  console.error(notValidated);
+  const kNRegex = /^\d{2}:\d{2}:\d{6,7}:\d{1,6}$/g;
+  const parsedInput = parseInput(kNumbers.value);
+
+  if (!kNumbers.value.length) return;
+
+  if (parsedInput.length > 5) {
+    dialog.show("Можно вводить не более 20 кадастровых номеров за один раз");
+    return;
+  }
+
+  const notValidated = parsedInput.filter((item) => !item.match(kNRegex));
+
   if (notValidated.length) {
     firstLoad.value = false;
     dialog.show(`Не прошли валидацию: ${notValidated}`);
@@ -49,16 +54,66 @@ const onClick = () => {
         return;
       } else {
         spinner.hide(table.show, data.data);
-        parsedInput = null;
       }
     });
 };
 
 const validateOnInput = (input) => {
-  // console.error(input);
+  nextTick().then(() => {
+    console.error(input);
+    kNumbers.value = kNumbers.value.slice(0, -1);
+  });
 };
 
-const validateOnSend = (input) => {
+const inputValidator = {
+  lastValue: null,
+  validate(input) {
+    if (!input) return;
+
+    const diff = {
+      value: null,
+      index: null,
+    };
+
+    if (this.lastValue) {
+      // if it's pasted - ignore it
+      if (input.length - this.lastValue.length > 1) return;
+
+      input.split("").forEach((char, index) => {
+        if (char != this.lastValue.charAt(index)) {
+          diff.value = char;
+          diff.index = index;
+        }
+      });
+    } else {
+      diff.value = input;
+      diff.index = 0;
+    }
+
+    // validate the diff
+    const validated = /[\d:;,]/.test(diff.value);
+
+    if (!validated) {
+      nextTick().then(() => {
+        if (diff.index === 0) {
+          kNumbers.value = input.slice(1);
+        } else {
+          kNumbers.value = this.lastValue =
+            input.slice(0, diff.index) + input.slice(diff.index + 1);
+        }
+      });
+    } else {
+      this.lastValue = input;
+    }
+
+    // console.error(diff);
+    // console.error(validated);
+    // console.error(kNumbers.value);
+    // console.error(this);
+  },
+};
+
+const parseInput = (input) => {
   const kNSet = new Set();
   kNSet.add(input);
 
@@ -79,10 +134,9 @@ const validateOnSend = (input) => {
     }
   }
 
-  parsedInput = [...kNSet];
-  console.error([...kNSet]);
-  return [...kNSet].filter((item) => !item.match(kNRegex));
-  // return [];
+  // console.error([...kNSet]);
+
+  return [...kNSet];
 };
 
 const parseInputForRequest = (input) => {
@@ -170,7 +224,7 @@ const table = {
         :error="!isValid"
         class="consul-input"
         clearable
-        @update:model-value="validateOnInput"
+        @update:model-value="(e) => inputValidator.validate(e)"
       >
         <template v-slot:append>
           <q-btn round dense flat icon="info">
