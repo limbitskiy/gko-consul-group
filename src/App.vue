@@ -2,11 +2,6 @@
 import CHead from "./components/CHead.vue";
 import CContent from "./components/CContent.vue";
 import CFooter from "./components/CFooter.vue";
-// import { useQuasar } from "quasar";
-
-// const $q = useQuasar();
-
-// $q.dark.set(true);
 </script>
 
 <template>
