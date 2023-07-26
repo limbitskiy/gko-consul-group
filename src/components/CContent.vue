@@ -36,15 +36,22 @@ const table = reactive({
 
 const dialog = reactive({
   showSimpleDialog: false,
-  showListDialog: false,
+  showFullDialog: false,
   dialogText: "",
+  dialogList: "",
 
-  show(text, type) {
+  show(text) {
     this.dialogText = text;
     this.showSimpleDialog = true;
   },
+  showFull(text, list) {
+    this.dialogText = text;
+    this.dialogList = list;
+    this.showFullDialog = true;
+  },
   hide() {
     this.showSimpleDialog = false;
+    this.showFullDialog = false;
   },
 });
 
@@ -74,45 +81,6 @@ const spinner = reactive({
   },
 });
 
-const onClick = () => {
-  if (!input.value.length) return;
-
-  const kNRegex = /^\d{2}:\d{2}:\d{6,7}:\d{1,6}$/g;
-  const parsedInput = parseInput(input.value);
-
-  if (parsedInput.length > 5) {
-    dialog.show("Можно вводить не более 20 кадастровых номеров за один раз");
-    return;
-  }
-
-  const notValidated = parsedInput.filter((item) => !item.match(kNRegex));
-
-  if (notValidated.length) {
-    dialog.show(`Не соблюден формат кадастрового номера: ${notValidated}`);
-    return;
-  }
-
-  spinner.show();
-  table.hide();
-
-  axios
-    .post(api, {
-      numbers: parsedInput,
-    })
-    .then((res) => res.data)
-    .then((data) => {
-      if (!data.data.length) {
-        spinner.hide(
-          dialog.show.bind(dialog),
-          "По данному запросу ничего не найдено"
-        );
-        return;
-      } else {
-        spinner.hide(table.show.bind(table), data.data);
-      }
-    });
-};
-
 const parseInput = (input) => {
   const kNSet = new Set();
   kNSet.add(input);
@@ -135,6 +103,48 @@ const parseInput = (input) => {
   }
 
   return [...kNSet];
+};
+
+const onClick = () => {
+  if (!input.value.length) return;
+
+  const kNRegex = /^\d{2}:\d{2}:\d{6,7}:\d{1,6}$/g;
+  const parsedInput = parseInput(input.value);
+
+  if (parsedInput.length > 20) {
+    dialog.show("Можно вводить не более 20 кадастровых номеров за один раз");
+    return;
+  }
+
+  const notValidated = parsedInput.filter((item) => !item.match(kNRegex));
+
+  if (notValidated.length) {
+    dialog.showFull(
+      `Не соблюден формат кадастрового номера для следующих позиций:`,
+      notValidated
+    );
+    return;
+  }
+
+  spinner.show();
+  table.hide();
+
+  axios
+    .post(api, {
+      numbers: parsedInput,
+    })
+    .then((res) => res.data)
+    .then((data) => {
+      if (!data.data.length) {
+        spinner.hide(
+          dialog.show.bind(dialog),
+          "По данному запросу ничего не найдено"
+        );
+        return;
+      } else {
+        spinner.hide(table.show.bind(table), data.data);
+      }
+    });
 };
 </script>
 
@@ -215,7 +225,9 @@ const parseInput = (input) => {
 
   <CBanner v-if="table.isVisible" />
 
-  <CSpinner v-if="spinner.isLoading" />
+  <Transition>
+    <CSpinner v-if="spinner.isLoading" />
+  </Transition>
 
   <q-dialog
     v-model="dialog.showSimpleDialog"
@@ -239,7 +251,7 @@ const parseInput = (input) => {
   </q-dialog>
 
   <q-dialog
-    v-model="dialog.showListDialog"
+    v-model="dialog.showFullDialog"
     :square="true"
     class="consul-dialog"
   >
@@ -250,7 +262,22 @@ const parseInput = (input) => {
       </q-card-section>
 
       <q-card-section class="q-pt-none text-subtitle1">
-        {{ dialogText }}
+        {{ dialog.dialogText }}
+      </q-card-section>
+
+      <q-card-section class="q-pt-none text-subtitle1">
+        <ul>
+          <li v-for="item in dialog.dialogList" :key="item">
+            {{ item }}
+          </li>
+        </ul>
+      </q-card-section>
+
+      <q-card-section class="q-pt-none text-subtitle1">
+        <span style="color: #c4c4c4"
+          >Кадастровый номер должен состоять из цифр, разделенных двоеточиями:
+          <u>00:00:0000000:0000</u></span
+        >
       </q-card-section>
 
       <q-card-actions align="right">
@@ -373,6 +400,25 @@ const parseInput = (input) => {
     align-items: center;
     gap: 0.7rem;
   }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #434343;
+  }
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
 }
 </style>
 

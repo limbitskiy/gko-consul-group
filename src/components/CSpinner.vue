@@ -7,7 +7,7 @@
   </div>
 </template>
 
-<style>
+<style scoped lang="scss">
 .overlay {
   position: fixed;
   left: 0;
