@@ -196,7 +196,7 @@ const onClick = () => {
                     Планируемая дата начала применения указанной кадастровой
                     стоимости: с 01.01.2024г
                   </li>
-                  <li>Срок подачи замечаний на Отчет по ГКО: до __.__.____г</li>
+                  <li>Срок подачи замечаний на Отчет по ГКО: до 10.10.2023г</li>
                 </ul>
               </q-banner>
             </q-popup-proxy>
@@ -223,7 +223,7 @@ const onClick = () => {
 
   <CTable v-if="table.isVisible" :data="table.tableData" />
 
-  <CBanner v-if="table.isVisible" />
+  <CBanner v-if="table.isVisible" :numbers="table.tableData" />
 
   <Transition>
     <CSpinner v-if="spinner.isLoading" />

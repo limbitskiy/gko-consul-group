@@ -1,5 +1,31 @@
 <script setup>
 import { ref } from "vue";
+import "../styles/index.css";
+
+const props = defineProps(["numbers"]);
+
+const form = ref(null);
+const showContactDialog = ref(false);
+const phone = ref("");
+const mail = ref("");
+
+const getNumbers = (numbers) => numbers.map((item) => item.number);
+
+const modelMultiple = ref(getNumbers(props.numbers));
+
+const onSubmit = () => {
+  form.value.validate().then((success) => {
+    if (success) {
+      console.log("+7" + phone.value);
+      console.log(mail.value);
+      console.log(getNumbers(props.numbers));
+      phone.value = "";
+      mail.value = "";
+      modelMultiple.value = getNumbers(props.numbers);
+      showContactDialog.value = false;
+    }
+  });
+};
 </script>
 
 <template>
@@ -14,11 +40,97 @@ import { ref } from "vue";
       class="consul-button"
       label="ОТПРАВИТЬ СООБЩЕНИЕ"
       :square="true"
+      @click="showContactDialog = true"
     />
   </div>
+
+  <q-dialog
+    v-model="showContactDialog"
+    :square="true"
+    :persistent="true"
+    class="consul-dialog feedback-dialog"
+  >
+    <q-card>
+      <q-card-section class="consul-dialog__header">
+        <q-icon name="contact_support" />
+        <div class="text-h6">Отправить сообщение</div>
+      </q-card-section>
+
+      <q-card-section class="q-pt-none text-subtitle1">
+        <q-form @submit.prevent="onSubmit" class="q-gutter-md" ref="form">
+          <q-input
+            filled
+            v-model="phone"
+            label="Введите телефон"
+            :square="true"
+            outlined
+            clearable
+            mask="(###) ### - ####"
+            prefix="+7"
+            unmasked-value
+            lazy-rules
+            :rules="[
+              (val) => val.length > 9 || 'Номер должен состоять из 10 символов',
+            ]"
+          />
+
+          <q-input
+            filled
+            type="email"
+            v-model="mail"
+            label="Введите свою почту"
+            :square="true"
+            outlined
+            clearable
+            :rules="[
+              (val) => (val !== null && val !== '') || 'Это обязательное поле',
+              (val) =>
+                (val.length > 0 && val.length < 100) || 'Это обязательное поле',
+            ]"
+          />
+
+          <q-select
+            class="multiselect"
+            filled
+            v-model="modelMultiple"
+            :options-dense="true"
+            popup-content-class="select-dropdown"
+            multiple
+            transition-show="flip-up"
+            transition-hide="flip-down"
+            :options="getNumbers(props.numbers)"
+            :square="true"
+            use-chips
+            outlined
+            stack-label
+            label="Кадастровый(-е) номер(-а)"
+            :rules="[
+              (val) =>
+                (val !== null && val.length) || 'Выберите кадастровый номер',
+            ]"
+          />
+        </q-form>
+      </q-card-section>
+
+      <q-card-actions align="right">
+        <q-btn flat label="OK" color="red" @click="onSubmit" />
+        <q-btn flat label="Отмена" color="grey" v-close-popup />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <style scoped lang="scss">
+.select-dropdown {
+  font-size: 12px !important;
+}
+.multiselect {
+  width: 500px;
+
+  @media (max-width: 600px) {
+    width: initial;
+  }
+}
 .banner {
   display: flex;
   flex-direction: column;

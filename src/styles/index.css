@@ -1,0 +1,9 @@
+.consul-dialog {
+  /* background-color: black; */
+}
+
+.consul-dialog__header {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}

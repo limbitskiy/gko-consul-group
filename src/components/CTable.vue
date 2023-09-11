@@ -10,7 +10,7 @@ const columns = [
     label: "Кадастровый номер",
     align: "left",
     field: "number",
-    format: (val) => `${val}`,
+    // format: (val) => `${val}`,
     sortable: true,
   },
   {
@@ -18,6 +18,20 @@ const columns = [
     align: "center",
     label: "Кадастровая стоимость",
     field: "cost",
+    format: (val) => {
+      // insert a space every 3 digits from the end
+      const str = "" + val;
+      const strArr = str.split(".");
+      const wholeArr = [];
+
+      let remainingNum = strArr[0];
+      while (remainingNum.length > 0) {
+        wholeArr.unshift(" " + remainingNum.slice(-3));
+        remainingNum = remainingNum.slice(0, -3);
+      }
+      const firstPart = wholeArr.join("");
+      return firstPart + (strArr[1] ? "." + strArr[1] : "");
+    },
     sortable: true,
   },
   // { name: "fat", label: "УПКС", field: "fat", sortable: true },
@@ -80,7 +94,7 @@ const tableMode = ref(false);
 
       <li>
         <span class="table-details__title">Срок подачи</span>
-        <p>Срок подачи замечаний на Отчет по ГКО: до __.__.____г</p>
+        <p>Срок подачи замечаний на Отчет по ГКО: до 10.10.2023г</p>
       </li>
     </ul>
   </div>

@@ -5,7 +5,11 @@ import { ref } from "vue";
 <template>
   <div class="header">
     <div class="header-part header-part__left">
-      <a class="logo-link logo-link__ownex" href="https://ownex.pro/landing/">
+      <a
+        class="logo-link logo-link__ownex"
+        href="https://ownex.pro"
+        target="_blank"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
