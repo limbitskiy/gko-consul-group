@@ -62,6 +62,7 @@ const tableMode = ref(false);
         /><span>Карточки</span>
       </div>
       <q-table
+        rowsPerPageLabel="Строк на странице:"
         table-style="font-size: 2rem"
         flat
         :grid="tableMode"
