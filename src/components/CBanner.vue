@@ -1,11 +1,17 @@
 <script setup>
 import { ref } from "vue";
 import "../styles/index.css";
+import axios from "axios";
 
 const props = defineProps(["numbers"]);
 
+const api = "https://api3.consul.group/v1/ownex/cost/email";
+
 const form = ref(null);
 const showContactDialog = ref(false);
+const showSuccessDialog = ref(false);
+const showErrorDialog = ref(false);
+const name = ref("");
 const phone = ref("");
 const mail = ref("");
 
@@ -16,13 +22,35 @@ const modelMultiple = ref(getNumbers(props.numbers));
 const onSubmit = () => {
   form.value.validate().then((success) => {
     if (success) {
-      console.log("+7" + phone.value);
-      console.log(mail.value);
-      console.log(getNumbers(props.numbers));
-      phone.value = "";
-      mail.value = "";
-      modelMultiple.value = getNumbers(props.numbers);
-      showContactDialog.value = false;
+      // const payload = {
+      //   name: name.value,
+      //   phone: `+7 ${phone.value}`,
+      //   email: mail.value,
+      //   cadastre: getNumbers(props.numbers).join(","),
+      // };
+
+      // console.log(payload);
+
+      axios
+        .post(api, {
+          name: name.value,
+          phone: `+7 ${phone.value}`,
+          email: mail.value,
+          cadastre: getNumbers(props.numbers).join(","),
+        })
+        .then(() => {
+          name.value = "";
+          phone.value = "";
+          mail.value = "";
+          modelMultiple.value = getNumbers(props.numbers);
+          showContactDialog.value = false;
+          showSuccessDialog.value = true;
+        })
+        .catch((error) => {
+          console.error(error);
+          showContactDialog.value = false;
+          showErrorDialog.value = true;
+        });
     }
   });
 };
@@ -58,6 +86,21 @@ const onSubmit = () => {
 
       <q-card-section class="q-pt-none text-subtitle1">
         <q-form @submit.prevent="onSubmit" class="q-gutter-md" ref="form">
+          <q-input
+            filled
+            v-model="name"
+            label="Введите Ваше имя"
+            :square="true"
+            outlined
+            clearable
+            lazy-rules
+            :rules="[
+              (val) => (val !== null && val !== '') || 'Это обязательное поле',
+              (val) =>
+                (val.length > 0 && val.length < 100) || 'Это обязательное поле',
+            ]"
+          />
+
           <q-input
             filled
             v-model="phone"
@@ -115,6 +158,40 @@ const onSubmit = () => {
       <q-card-actions align="right">
         <q-btn flat label="OK" color="red" @click="onSubmit" />
         <q-btn flat label="Отмена" color="grey" v-close-popup />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+
+  <q-dialog v-model="showSuccessDialog" :square="true" class="consul-dialog">
+    <q-card>
+      <q-card-section class="consul-dialog__header">
+        <q-icon name="done" />
+        <div class="text-h6">Успех</div>
+      </q-card-section>
+
+      <q-card-section class="q-pt-none text-subtitle1">
+        Сообщение отправлено успешно.
+      </q-card-section>
+
+      <q-card-actions align="right">
+        <q-btn flat label="OK" color="red" v-close-popup />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+
+  <q-dialog v-model="showErrorDialog" :square="true" class="consul-dialog">
+    <q-card>
+      <q-card-section class="consul-dialog__header">
+        <q-icon name="error" />
+        <div class="text-h6">Ошибка</div>
+      </q-card-section>
+
+      <q-card-section class="q-pt-none text-subtitle1">
+        При отправке сообщения возникла ошибка.
+      </q-card-section>
+
+      <q-card-actions align="right">
+        <q-btn flat label="OK" color="red" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
