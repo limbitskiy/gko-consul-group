@@ -164,7 +164,7 @@ const onClick = () => {
         outlined
         autogrow
         :square="true"
-        placeholder="Не более 20 обьектов"
+        placeholder="До 20 объектов через запятую или пробел"
         type="number"
         v-model="input"
         class="consul-input"
