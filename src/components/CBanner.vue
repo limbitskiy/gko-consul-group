@@ -5,7 +5,7 @@ import axios from "axios";
 
 const props = defineProps(["numbers"]);
 
-const api = "https://api3.consul.group/v1/ownex/cost/email";
+const api = `${import.meta.env.VITE_APIHOST}/v1/ownex/cost/email`;
 
 const form = ref(null);
 const showContactDialog = ref(false);

@@ -5,7 +5,7 @@ import CBanner from "./CBanner.vue";
 import CSpinner from "./CSpinner.vue";
 import axios from "axios";
 
-const api = "https://api3.consul.group/v1/ownex/cost";
+const api = `${import.meta.env.VITE_APIHOST}/v1/ownex/cost`;
 
 const input = ref("");
 
@@ -164,7 +164,7 @@ const onClick = () => {
         outlined
         autogrow
         :square="true"
-        placeholder="До 20 объектов через запятую или пробел"
+        placeholder="Не более 20 обьектов"
         type="number"
         v-model="input"
         class="consul-input"
@@ -193,10 +193,10 @@ const onClick = () => {
                     рассчитанная в рамках проведения очередной ГКО.
                   </li>
                   <li>
-                    Планируемая дата начала применения указанной кадастровой
-                    стоимости: с 01.01.2024г
+                    Дата начала применения указанной кадастровой стоимости: с
+                    01.01.2024г
                   </li>
-                  <li>Срок подачи замечаний на Отчет по ГКО: до 10.10.2023г</li>
+                  <!-- <li>Срок подачи замечаний на Отчет по ГКО: до 10.10.2023г</li> -->
                 </ul>
               </q-banner>
             </q-popup-proxy>

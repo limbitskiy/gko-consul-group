@@ -76,7 +76,7 @@ const tableMode = ref(false);
       />
     </div>
 
-    <ul class="table-details">
+    <!-- <ul class="table-details">
       <li>
         <span class="table-details__title">Стоимость объекта</span>
         <p>
@@ -97,7 +97,7 @@ const tableMode = ref(false);
         <span class="table-details__title">Срок подачи</span>
         <p>Срок подачи замечаний на Отчет по ГКО: до 10.10.2023г</p>
       </li>
-    </ul>
+    </ul> -->
   </div>
 </template>
 
