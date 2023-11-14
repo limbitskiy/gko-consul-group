@@ -164,10 +164,11 @@ const onClick = () => {
         outlined
         autogrow
         :square="true"
-        placeholder="Не более 20 обьектов"
-        type="number"
+        placeholder="Не более 20 объектов за один запрос через запятую, точку с запятой или перенос строки"
+        type="textarea"
         v-model="input"
         class="consul-input"
+        inputClass="consul-input-textarea"
         clearable
         :rules="[
           (val) =>

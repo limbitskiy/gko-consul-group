@@ -2,6 +2,11 @@
   /* background-color: black; */
 }
 
+.consul-input-textarea {
+  min-height: 120px !important;
+  line-height: 1 !important;
+}
+
 .consul-dialog__header {
   display: flex;
   align-items: center;
