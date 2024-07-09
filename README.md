@@ -1,5 +1,7 @@
 ### GKO webpage for consul group
 
+[gko.consul.group](https://gko.consul.group)
+
 **Stack:**
 
 - Vue3
@@ -9,5 +11,3 @@
 
 ![screenshot1](/screenshots/1.png)
 ![screenshot2](/screenshots/2.png)
-
-**Link:** [gko.consul.group](https://gko.consul.group)
